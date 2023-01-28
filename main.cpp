@@ -17,17 +17,16 @@ data file should look like:
 (columns separated by ' ')
 */
 
-#define ARG_INPUT 1
-#define	ARG_OUTPUT 2
-#define ARG_BETA_MIN 3
-#define ARG_BETA_MAX 4
-#define ARG_BETA_STEPS 5
-#define ARG_BLOCK 6
-#define ARG_SPACE 7
-#define ARG_TIME 8
-#define ARG_DIM 9
+#define ARG_INPUT		1
+#define	ARG_OUTPUT		2
+#define ARG_BETA_MIN	3
+#define ARG_BETA_MAX	4
+#define ARG_BETA_STEPS	5
+#define ARG_SPACE		6
+#define ARG_TIME		7
+#define ARG_DIM			8
 
-#define ARGS_NUM 10
+#define ARGS_NUM 		9
 
 int main(int argc, char* argv[]) {
 
@@ -72,7 +71,6 @@ int main(int argc, char* argv[]) {
 	double beta_min = atof(argv[ARG_BETA_MIN]);
 	double beta_max = atof(argv[ARG_BETA_MAX]);
 	int beta_step_num = atoi(argv[ARG_BETA_STEPS]);
-	int block = atoi(argv[ARG_BLOCK]);
 	int space_ext = atoi(argv[ARG_SPACE]);
 	int time_ext = atoi(argv[ARG_TIME]);
 	int st_dim = atoi(argv[ARG_DIM]);
@@ -185,25 +183,38 @@ int main(int argc, char* argv[]) {
     std::cout << std::fixed << std::setprecision(15) << target_betas[j] << "\t" << poly_mean << "\t" << poly_susc <<"\n";
 	}
 */
-	std::ofstream output(argv[ARG_OUTPUT]);
-	if (output.fail()) {
-		std::cerr << "Unable to open output file" << std::endl;
+	std::ifstream out_info(argv[ARG_OUTPUT]);
+	if (out_info.fail()) {
+		std::cerr << "Unable to open output info file" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
+	std::string out_name;
+	int block;
 	double err_mean, err_susc;
 	std::vector<double>* weights = new std::vector<double>[nrun];
-	for (int j = 0; j <= beta_step_num; j++) {
-		compute_weights(target_betas[j], nrun, betas, energies, logZs, weights);
-	
-		jackknife_mean_susc(polyakovs, nrun, weights, block, poly_mean, poly_susc, err_mean, err_susc);
-		
-		output << target_betas[j] << " "
-			<< poly_mean << " " << err_mean << " "
-			<< poly_susc << " " << err_susc << std::endl;
-		
-		for (int k = 0; k < nrun; k++) weights[k].clear();
+	std::ofstream output;
+	while (out_info >> out_name) {
+		if (!(out_info >> block)) {
+			std::cerr << "Unable to find block dimention for " << out_name << "\n";
+			exit(EXIT_FAILURE);
+		}
+		output.open(out_name);
+
+		for (int j = 0; j <= beta_step_num; j++) {
+			compute_weights(target_betas[j], nrun, betas, energies, logZs, weights);
+			jackknife_mean_susc(polyakovs, nrun, weights, block, poly_mean, poly_susc, err_mean, err_susc);
+			output << target_betas[j] << " "
+				<< poly_mean << " " << err_mean << " "
+				<< poly_susc << " " << err_susc << std::endl;
+			
+			for (int k = 0; k < nrun; k++) weights[k].clear();
+		}
+
+		output.close();
 	}
+
+	
 	std::cout << " done! in " << std::difftime(std::time(nullptr), obs_time) << " seconds" << std::endl;
 
 	delete[] weights;
