@@ -44,7 +44,8 @@ int main(int argc, char* argv[]) {
 #elif defined( __GNUC__ )
 		std::cout << "Compiled with gcc " << __GNUC__ << " " << __GNUC_MINOR__ << " " << " " << __GNUC_PATCHLEVEL__ << "\n";
 #endif // __INTEL_COMPILER
-		std::cout << "Usage: " << argv[0] << " input_file output_file beta_min beta_max beta_step_num block L T space_time_dim\n";
+		std::cout << "Usage: " << argv[0] << " input_file block_size beta_min beta_max beta_step_num block L T space_time_dim bootstrap_iterations\n"
+            << "output in " POLY_F_NAME " and " SUSC_F_NAME << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -133,6 +134,10 @@ int main(int argc, char* argv[]) {
 
 	input.close();
 
+    std::cout << "beta \t #ener \t #poly \n";
+	for (crun = 0; crun < nrun; crun++)
+		std::cout << betas[crun] << "\t" << energies[crun].size() << "\t" << polyakovs[crun].size() << "\n"; 
+
     srand((int) time(nullptr));
 
     double* target_betas = new double[beta_step_num];
@@ -170,6 +175,11 @@ int main(int argc, char* argv[]) {
         energies[crun].reserve(tot_blocks);
         polyakovs[crun].reserve(tot_blocks);
         total_stat += tot_blocks;
+    }
+
+    if (total_stat == 0) {
+        std::cerr << "No data was read! Unable to proceed\n";
+		exit(EXIT_FAILURE);
     }
 
     for (int boot = 0; boot < boot_num; boot++) {
