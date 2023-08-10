@@ -199,9 +199,9 @@ int main(int argc, char* argv[]) {
 		for (int j = 0; j <= beta_step_num; j++) {
 			compute_weights(target_betas[j], nrun, betas, energies, logZs, weights);
 			jackknife_mean_susc(polyakovs, nrun, weights, block, poly_mean, poly_susc, err_mean, err_susc);
-			output_poly << boot << " " << target_betas[j] << " "
+			output_poly << std::setprecision(15) << boot << " " << target_betas[j] << " "
 				<< poly_mean << " " << err_mean << "\n";
-            output_susc << boot << " " << target_betas[j] << " "
+            output_susc << std::setprecision(15) << boot << " " << target_betas[j] << " "
 				<< poly_susc << " " << err_susc << "\n";
 			
 			for (int k = 0; k < nrun; k++) weights[k].clear();
