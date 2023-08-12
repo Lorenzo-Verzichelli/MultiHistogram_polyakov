@@ -45,7 +45,7 @@ public:
 
     ran2_gen(FILE *in) {
         int sum = 0;
-        sum += fscanf(in, "%d\t%d\t%d\n", &idum, &idum2, &iy);
+        sum += fscanf(in, "%ld\t%ld\t%ld\n", &idum, &idum2, &iy);
         for(int j = 0; j < NTAB; j++) sum += fscanf (in, "%d\n", iv + j);
         if (sum != NTAB + 3) perror("BUILDING RAN2 FROM FILE: wrong file layout.\n");
     }
@@ -81,7 +81,7 @@ public:
     }
 
     void print_status(FILE *out = stdout) {
-        fprintf(out, "%d\t%d\t%d\n", idum, idum2, iy);
+        fprintf(out, "%ld\t%ld\t%ld\n", idum, idum2, iy);
         for (int j = 0; j < NTAB; j++) fprintf(out, "%d\n", iv[j]);
     }
 };
