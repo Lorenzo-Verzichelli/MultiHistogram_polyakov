@@ -2,7 +2,7 @@
 
 constexpr long IM1 = 2147483563;
 constexpr long IM2 = 2147483399;
-constexpr double AM = 1.0/IM1;
+constexpr float AM = 1.0f / (float) IM1;
 constexpr long IMM1 = IM1-1;
 constexpr long IA1 = 40014;
 constexpr long IA2 = 40692;
@@ -12,8 +12,8 @@ constexpr long IR1 = 12211;
 constexpr long IR2 = 3791;
 constexpr int NTAB = 32;
 constexpr long NDIV  = 1 + IMM1/NTAB;
-constexpr double EPS = 1.2e-7;
-constexpr double RNMX = 1.0-EPS;
+constexpr float EPS = 1.2e-7f;
+constexpr float RNMX = 1.0f - EPS;
 
 class ran2_gen {
     long idum = 0, idum2 = 12345, iy = 0, iv[NTAB];
@@ -46,7 +46,7 @@ public:
     ran2_gen(FILE *in) {
         int sum = 0;
         sum += fscanf(in, "%ld\t%ld\t%ld\n", &idum, &idum2, &iy);
-        for(int j = 0; j < NTAB; j++) sum += fscanf (in, "%d\n", iv + j);
+        for(int j = 0; j < NTAB; j++) sum += fscanf (in, "%ld\n", iv + j);
         if (sum != NTAB + 3) perror("BUILDING RAN2 FROM FILE: wrong file layout.\n");
     }
 
@@ -57,12 +57,12 @@ public:
         k = idum2/IQ2;
         idum2 = IA2 * (idum2 - k*IQ2) - k*IR2;
         if (idum2 < 0) idum2 += IM2;
-        int j=iy/NDIV;
+        int j= (int) (iy/NDIV);
         iy=iv[j]-idum2;
         iv[j] = idum;
         if (iy < 1) iy += IMM1;
         float temp;
-        if ((temp=AM*iy) > RNMX) return RNMX;
+        if ((temp = AM * (float)iy) > RNMX) return RNMX;
         else return temp;
     }
 
@@ -73,7 +73,7 @@ public:
         k = idum2/IQ2;
         idum2 = IA2 * (idum2 - k*IQ2) - k*IR2;
         if (idum2 < 0) idum2 += IM2;
-        int j=iy/NDIV;
+        int j = (int) (iy/NDIV);
         iy=iv[j]-idum2;
         iv[j] = idum;
         if (iy < 1) iy += IMM1;
