@@ -4,8 +4,7 @@
 #include <string>
 #include <vector>
 #include <ctime>
-#include <cstdlib>
-
+#include "ObjectRan2.h"
 #include "MultiHistogram.h"
 #include "Jackknife.h"
 
@@ -140,7 +139,7 @@ int main(int argc, char* argv[]) {
 	for (crun = 0; crun < nrun; crun++)
 		std::cout << betas[crun] << "\t" << energies_read[crun].size() << "\t" << polyakovs_read[crun].size() << "\n"; 
 
-    srand((unsigned int) seed);
+    ran2_gen generator(seed);
 
     double* target_betas = new double[beta_step_num];
 	beta_step_num--;
@@ -207,7 +206,7 @@ int main(int argc, char* argv[]) {
             samples = (unsigned int) energies_read[crun].size();
             num_blocks = samples / block;
             for (int j = 0; j < num_blocks; j++) {
-                start = (rand() % num_blocks) * block;
+                start = generator.ran2int(num_blocks) * block;
                 for (int k = 0; k < block; k++) {
                     energies[crun].push_back(energies_read[crun][start + k]);
                     polyakovs[crun].push_back(polyakovs_read[crun][start + k]);
