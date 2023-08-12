@@ -156,7 +156,25 @@ int main(int argc, char* argv[]) {
 	std::time_t zeta_time = std::time(nullptr);
 	std::cout << "Computing zetas..."; std::cout.flush(); 
 	double* logZs = new double[nrun];
+
+	std::ifstream zeta_in("zeta.txt");
+	double beta_read;
+	crun = 0;
+	while (zeta_in >> beta_read) {
+		if (std::abs(beta_read - betas[crun]) > 1e-6) break;
+		zeta_in >> logZs[crun];
+		crun++;
+		if (crun >= nrun) break;
+	}
+	for (; crun < nrun; crun++) logZs[crun] = 0;
+	zeta_in.close();
+
 	compute_zetas(nrun, betas, energies, logZs);
+	std::ofstream zeta_out("zeta.txt");
+	for (int crun = 0; crun < nrun; crun++) {
+		zeta_out << std::fixed << std::setprecision(15) << betas[crun] << " " << logZs[crun] << "\n";
+	}
+	zeta_out.close();
 
 	std::time_t obs_time = std::time(nullptr);
 	std::cout << " done! in " << std::difftime(obs_time, zeta_time) <<" seconds\n"

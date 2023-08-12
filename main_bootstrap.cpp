@@ -27,8 +27,9 @@ data file should look like:
 #define ARG_TIME		7
 #define ARG_DIM			8
 #define ARG_BOOT_NUM    9
+#define ARG_SEED       10
 
-#define ARGS_NUM 		10
+#define ARGS_NUM 	   11
 
 #define POLY_F_NAME "out_MH_poly_mean.dat"
 #define SUSC_F_NAME "out_MH_poly_susc.dat"
@@ -88,6 +89,7 @@ int main(int argc, char* argv[]) {
 	for (int dim = 1; dim < st_dim; dim++) {
 		quad_vol *= space_ext;
 	}
+	long seed = atol(argv[ARG_SEED]);
 
 	int t_plaq_num = (st_dim - 1) * quad_vol;
 	int s_plaq_num = t_plaq_num * (st_dim - 2) / 2;
@@ -138,7 +140,7 @@ int main(int argc, char* argv[]) {
 	for (crun = 0; crun < nrun; crun++)
 		std::cout << betas[crun] << "\t" << energies_read[crun].size() << "\t" << polyakovs_read[crun].size() << "\n"; 
 
-    srand((int) time(nullptr));
+    srand((unsigned int) seed);
 
     double* target_betas = new double[beta_step_num];
 	beta_step_num--;
@@ -151,12 +153,25 @@ int main(int argc, char* argv[]) {
     std::time_t zeta_time = std::time(nullptr);
 	std::cout << "Computing zetas..."; std::cout.flush(); 
 	double* logZs = new double[nrun];
-    for (int crun = 0; crun < nrun; crun++) logZs[crun] = 0;
-	compute_zetas(nrun, betas, energies_read, logZs);
 
-	for(int j = 0; j < beta_step_num; j++) {
-		std::cout << std::fixed << std::setprecision(15) << target_betas[j] << " " << logZs[j] << "\n";
+	std::ifstream zeta_in("zeta.txt");
+	double beta_read;
+	crun = 0;
+	while (zeta_in >> beta_read) {
+		if (std::abs(beta_read - betas[crun]) > 1e-6) break;
+		zeta_in >> logZs[crun];
+		crun++;
+		if (crun >= nrun) break;
 	}
+	for (; crun < nrun; crun++) logZs[crun] = 0;
+	zeta_in.close();
+
+	compute_zetas(nrun, betas, energies_read, logZs);
+	std::ofstream zeta_out("zeta.txt");
+	for (int crun = 0; crun < nrun; crun++) {
+		zeta_out << std::fixed << std::setprecision(15) << betas[crun] << " " << logZs[crun] << "\n";
+	}
+	zeta_out.close();
 
 	std::time_t obs_time = std::time(nullptr);
 	std::cout << " done! in " << std::difftime(obs_time, zeta_time) <<" seconds\n"
@@ -197,7 +212,7 @@ int main(int argc, char* argv[]) {
                     energies[crun].push_back(energies_read[crun][start + k]);
                     polyakovs[crun].push_back(polyakovs_read[crun][start + k]);
                 }
-            }
+			}
         }
 
 		for (int j = 0; j <= beta_step_num; j++) {
