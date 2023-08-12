@@ -1,19 +1,19 @@
 #include <stdio.h>
 
-#define IM1 2147483563
-#define IM2 2147483399
-#define AM (1.0/IM1)
-#define IMM1 (IM1-1)
-#define IA1 40014
-#define IA2 40692
-#define IQ1 53668
-#define IQ2 52774
-#define IR1 12211
-#define IR2 3791
-#define NTAB 32
-#define NDIV (1+IMM1/NTAB)
-#define EPS 1.2e-7
-#define RNMX (1.0-EPS)
+constexpr long IM1 = 2147483563;
+constexpr long IM2 = 2147483399;
+constexpr double AM = 1.0/IM1;
+constexpr long IMM1 = IM1-1;
+constexpr long IA1 = 40014;
+constexpr long IA2 = 40692;
+constexpr long IQ1 = 53668;
+constexpr long IQ2 = 52774;
+constexpr long IR1 = 12211;
+constexpr long IR2 = 3791;
+constexpr int NTAB = 32;
+constexpr long NDIV  = 1 + IMM1/NTAB;
+constexpr double EPS = 1.2e-7;
+constexpr double RNMX = 1.0-EPS;
 
 class ran2_gen {
     long idum = 0, idum2 = 12345, iy = 0, iv[NTAB];
@@ -82,6 +82,6 @@ public:
 
     void print_status(FILE *out = stdout) {
         fprintf(out, "%ld\t%ld\t%ld\n", idum, idum2, iy);
-        for (int j = 0; j < NTAB; j++) fprintf(out, "%d\n", iv[j]);
+        for (int j = 0; j < NTAB; j++) fprintf(out, "%ld\n", iv[j]);
     }
 };

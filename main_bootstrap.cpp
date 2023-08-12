@@ -177,7 +177,7 @@ int main(int argc, char* argv[]) {
 		<< "Computing obsevables..."; std::cout.flush();
 
 	double poly_mean, poly_susc;
-    int num_blocks, start, tot_blocks;
+    int num_blocks, start, start0, tot_blocks;
     unsigned int samples, total_stat;
 
   	double err_mean, err_susc;
@@ -205,8 +205,9 @@ int main(int argc, char* argv[]) {
 	    for (int crun = 0; crun < nrun; crun++) {
             samples = (unsigned int) energies_read[crun].size();
             num_blocks = samples / block;
+			start0 = samples - num_blocks * block;
             for (int j = 0; j < num_blocks; j++) {
-                start = generator.ran2int(num_blocks) * block;
+                start = (int) generator.ran2int(num_blocks) * block + start0;
                 for (int k = 0; k < block; k++) {
                     energies[crun].push_back(energies_read[crun][start + k]);
                     polyakovs[crun].push_back(polyakovs_read[crun][start + k]);
